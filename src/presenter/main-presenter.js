@@ -9,16 +9,24 @@ export default class Presenter {
   editFormViewComponent = new EditForm();
   pointsListViewComponent = new PointsList();
 
-  constructor({container}) {
+  constructor({ container, model }) {
     this.container = container;
+    this.model = model;
   }
 
-  init(){
+  init() {
     render(this.pointsListViewComponent, this.container);
+    const points = this.model.getPoints();
+    points.forEach((point) => {
+      const destination = this.model.getDestinationById(point.destination);
+      const pointOffers = point.offers.map((offerId) =>
+        this.model.getOfferById(point.type, offerId)
+      );
+
+      const pointView = new PointView(point, destination, pointOffers);
+      render(pointView, this.pointsListViewComponent.getElement());
+    });
     render(this.editFormViewComponent, this.pointsListViewComponent.getElement());
     render(this.createFormViewComponent, this.pointsListViewComponent.getElement());
-    for(let i = 0; i < 3; i++){
-      render(new PointView(), this.pointsListViewComponent.getElement());
-    }
   }
 }
